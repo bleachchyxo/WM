@@ -24,7 +24,12 @@ and you should get an output like this if you've done everything correctly:
     Copyright (C) 2018 Free Software Foundation, Inc.
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- 
+
+Also you need to install some `C` header files that `dwm` will be using.
+
+    $ sudo apt install libx11-dev ( not sure)
+    $ sudo apt install libxft-dev
+
 ## Note
 You must install `git` too, this one is easy to install since all you need to do to install the package it's just typing the well known
 
@@ -49,3 +54,15 @@ Next thing we are going to do its `cd` into the new `dwm` folder created in our 
     config.def.h  drw.c  dwm.1  dwm.png  Makefile trancient.c  util.h
     config.mk     drw.h  dwm.c  LICENSE  README   util.c
 
+We are need to rename the `config.def.h` file with the command:
+
+    $ mv config.def.h config.h
+    
+Once you've done this you can edit the file with your favorite text editor ( you will need some C knowledge ) and save the changes. Now we just need to compile every file by using the command:
+
+    $ sudo make install clean
+
+We also going to run the same command inside the `dmenu` and `st`/`standar` directories and once you finished compiling every those three directories you wanna
+go back to your `/home/user` directory and search for a `.xinitrc` file. In case it don't exits:
+
+    $ echo "exec dwm" >> ~/.xinitrc
