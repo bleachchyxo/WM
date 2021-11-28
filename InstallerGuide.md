@@ -27,7 +27,7 @@ and you should get an output like this if you've done everything correctly:
 
 Also you need to install some `C` header files that `dwm` will be using.
 
-    $ sudo apt install libx11-dev ( not sure)
+    $ sudo apt-get install libx11-dev libxinerama-dev
     $ sudo apt install libxft-dev
 
 ## Note
