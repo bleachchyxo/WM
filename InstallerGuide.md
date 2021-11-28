@@ -66,3 +66,11 @@ We also going to run the same command inside the `dmenu` and `st`/`standar` dire
 go back to your `/home/user` directory and search for a `.xinitrc` file. In case it don't exits:
 
     $ echo "exec dwm" >> ~/.xinitrc
+
+And you are supposed to be able to run `startx` command in order to start your dwm enviroment but in my case I get an error
+
+    xauth: timeout in locking authority file /home/user/.Xauthority
+
+But basically all you have to do is remove all the `.Xauthority` files by running this command:
+
+    $ rm -fr .Xauthority-*
