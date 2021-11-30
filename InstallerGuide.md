@@ -74,3 +74,26 @@ And you are supposed to be able to run `startx` command in order to start your d
 But basically all you have to do is remove all the `.Xauthority` files by running this command:
 
     $ rm -fr .Xauthority-*
+
+## Improving dwm
+You already installed dwm and you can use it and customize it howver you want but some stuff I think should be worth it to add its by adding this on your `.xinitrc`
+
+    [ -f /etc/xprofile ] && . /etc/xprofile
+    [ -f ~/.xprofile ] && . ~/.xprofile
+
+    while xsetroot -name " Battery: $(cat /sys/class/power_supply/BAT0/capacity)% | Date: `date` | WiFi: $(cat /sys/class/net/wlan0/operstate )"
+    do
+	    sleep 1
+    done &
+    exec dwm
+ 
+You can leave the `.xinitrc` as is but this way it will print out your battery status, date and time and your wifi status, also it starts your `.xprofile` which helps you displaying a wallpaper.
+
+In order to set up a wallpaper you will need the `xwallpaper` package, you can simply install this with:
+
+    $ sudo apt install xwallpaper
+
+Now you can use this to display a wallpaper, in my case my desired image file is `wall.png` and its on `~/.config/wallpapers/` so first of we must create an `.xprofile`
+
+    $ touch .xprofile
+
