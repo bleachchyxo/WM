@@ -93,7 +93,21 @@ In order to set up a wallpaper you will need the `xwallpaper` package, you can s
 
     $ sudo apt install xwallpaper
 
-Now you can use this to display a wallpaper, in my case my desired image file is `wall.png` and its on `~/.config/wallpapers/` so first of we must create an `.xprofile`
+Now you can use this to display a wallpaper, in my case my desired image file is `wall.png` and its on `~/.config/wallpapers/`. We can set this wallpaper by running the command
 
-    $ touch .xprofile
+	$ xwallpaper --zoom ~/.config/wallpapers/wall.png
+
+By executing this command you already have a wallpaper displayed as your background. In my case I used the `--zoom` argument but you can use other, the aviable agruments can be check on
+
+	$ xwallpaper man
+	
+The problem with xwallpaper is that once you reboot your pc or terminate dwm the wallpaper is not saved so you must type the `xwallpaper --zoom ~/.config/wallpapers/wall.png` everytime you start dwm, but we dont want that so thats why we made a parameter in your `.xinitrc` earlier that checks on your `.xprofile`. Probably you won't have that file in your pc so you must create it
+
+	$ touch .xprofile
+
+And using the text editor of your preference you want to add the line
+
+	xwallpaper --zoom ~/.config/wallpapers/wall.png
+
+Once this command inside your `.xprofile` file you save the file and now you can end dwm by pressing `MODKEY` + `CTRL` + `Q`, this will causes your dwm terminates and you can restart it again with `startx` and look how your wallpaper is there as soon as your start it.
 
