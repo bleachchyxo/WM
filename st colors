@@ -1,0 +1,30 @@
+/* Terminal colors (16 first used in escape sequence) */
+static const char *colorname[] = {
+        /* 8 normal colors */
+        "#050b06",
+        "#5af16d",
+        "#19c256",
+        "#19c256",
+        "#19c256",
+        "#19c256",
+        "#19c256",
+        "#264c33",
+
+        /* 8 bright colors */
+        "#264C33",
+        "#19c256",
+        "#5af16c",
+        "#19c256",
+        "#5af16c",
+        "#19c256",
+        "#5af16d",
+        "#19c256",
+
+        [255] = 0,
+
+        /* more colors can be added after 255 to use with DefaultXX */
+        "#5af16d",
+        "#555555",
+        "#19c256", /* default foreground colour */
+        "#050b06", /* default background colour */
+};
