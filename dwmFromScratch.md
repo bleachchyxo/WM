@@ -122,7 +122,7 @@ folders want to exit from the `.config` folder and go back to `/home/user` and s
 
     # echo "exec dwm" >> ~/.xinitrc
 
-## Final steps
+## Installing Xorg
 You basically finished installing sucklees but there still a few problems we need to fix. Most linux distros use a window engine called `Xorg`, of course our Devuan installation doesn't have xorg installed but it's easy to install
 
     # apt install xorg
@@ -130,9 +130,42 @@ You basically finished installing sucklees but there still a few problems we nee
 
 With `Xorg` you can run basic windows like a browser or a videogame, etc.
 
+## Wicd
+
 Another problem we have is the internet connection, maybe you have a laptop and you don't want to depend on the ethernet cable, after all the whole point of a laptop it's their mobilty. So in order to be able to connect via `wireless` you need to install `wicd` a network manager that comes by default on Devuan (with a GUI of course).
 
     # apt install wicd
+    
+# Doas
+
+Most linux distros use `sudo` as their root manager, sudo has been proven insecure multiple times since it has lots of vunerabilies. Luckily our OS also forgot to install `sudo` out of the box so in case you want to install it just type
+
+    # apt install sudo
+
+In my case I'll be installing `doas`. The instructions are in the main github page https://github.com/slicer69/doas, but Im going to explain it anyways.
+
+
+First we need to install some extra packages
+
+    # apt install make bison flex libpam0g-dev
+
+Now you need to go back again inside your `.config` file and clone the doas repository:
+
+    # git clone https://github.com/slicer69/doas
+
+onced installed you `cd` into the new `doas` folder created and type
+
+    # make install
+
+And basically you just installed doas on your system, now you probably wanna give some user `root` perms so you need to create a file
+
+    # vim /usr/local/etc/doas.conf
+
+Again, I used `vim` but you can use whatever text editor you like. Now we are writing inside this new config file we just created we need to add a line:
+
+    permit user as root
+
+In this case you replace `user` to your user account or the account you want to give root privileges.
 
 You can now start your suckless enviroment, REMEMBER to exit the `root` just by tiping `exit` and you can run this command:
 
