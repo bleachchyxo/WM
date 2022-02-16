@@ -135,6 +135,13 @@ With `Xorg` you can run basic windows like a browser or a videogame, etc.
 Another problem we have is the internet connection, maybe you have a laptop and you don't want to depend on the ethernet cable, after all the whole point of a laptop it's their mobilty. So in order to be able to connect via `wireless` you need to install `wicd` a network manager that comes by default on Devuan (with a GUI of course).
 
     # apt install wicd
+
+# Alsa
+
+Our Devuan distro comes with pulseaudio and alsa (linux sound drivers) but an essential package it's missing for those drivers to work, so you need to install it
+too
+
+    # apt install alsa-utils
     
 # Doas
 
