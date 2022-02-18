@@ -1,6 +1,8 @@
 # Suckless installation guide from scratch
 Im going to be installing suckless from scratch on Devuan, this means I my Devuan installation has no GUI (You can avoid installing a GUI while installing the OS).
 
+https://github.com/bleachchyxo/WM/wiki
+
 ## Fixing the Devuan mirrors
 For some reason Devuan has a mirror on the source list that causes a `cdrom` error, this error makes you unable to download packages and update or upgrade your system. To fix this you just need to go on `root` by typing
 
