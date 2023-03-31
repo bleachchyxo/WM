@@ -1,49 +1,46 @@
 [ -f ~/.xprofile ] && . ~/.xprofile
+bat_path=/sys/class/power_supply/BAT0
+wifi_path=/sys/class/net/wlp3s0
+eth_path=/sys/class/net/enp0s25
 
 while true; do
 
+        # Volume
+        vstat="$(amixer get Master | awk -F'[][]' 'END{ print ""$2 }')"
+
         # Battery remaining
-        [ -f "/sys/class/power_supply/BAT0/capacity" ] && BSTAT="$(cat /sys/class/power_supply/BAT0/capacity)" || BSTAT="Cable connected"
-
-        # WIFI Status
-       #STAT="$(iwlist wlan0 rate | awk '/Rate=/ {print substr($3, 6, 5)}')"
-       #WSTAT="$(awk '/wlan0/ {print substr($3,1,2)}' /proc/net/wireless)"
-       #WSTAT=$((WSTAT * 10 / 7))
-
-        wifi_interface="wlan0"
-        WSTAT=" "
-
-        getStatus(){
-                cat /sys/class/net/$1/operstate
-        }
-
-        uploadSpeed(){
-                tx2=$(cat /sys/class/net/$1/statistics/tx_bytes)
-                uspeed=$(numfmt --to=iec $((tx2-tx1)))
-        }
-
-        downloadSpeed(){
-                rx2=$(cat /sys/class/net/$1/statistics/rx_bytes)
-                dspeed=$(numfmt --to=iec $((rx2-rx1)))
-        }
-
-        if [ "$(getStatus $wifi_interface)" = "up" ]; then
-                downloadSpeed $wifi_interface
-                uploadSpeed $wifi_interface
-                WSTAT="▼$dspeed/$uspeed▲"
+        if [ -e "$bat_path/capacity" ]; then
+                read -r bstat <"$bat_path/capacity"
+                read -r bat_status <"$bat_path/status"
+                btitle="| BAT: "
+                per="% "
+                bend="|"
         else
-                WSTAT="Offline"
+                bstat="|"
+                bat_status=
+                btitle=
+                per=
+                bend=
         fi
 
-        tx1=$(cat /sys/class/net/$1/statistics/tx_bytes)
-        rx1=$(cat /sys/class/net/$1/statistics/rx_bytes)
-        
-        
-        # Volume
-        VSTAT="$(amixer get Master | awk -F'[][]' 'END{ print $2 }')"
+        # Charging
+        if [ "$bat_status" = Charging ]; then
+                cstat="⚡ "
+        else
+                cstat=
+        fi
+
+        # Connection status
+        read -r wifi_state <"$wifi_path/operstate"
+        read -r ethernet_state <"$eth_path/operstate"
+        if [ "$wifi_state" = up ] || [ $ethernet_state = up ]; then
+                wstat=Up
+        else
+                wstat=Down
+        fi
 
         # Status render
-        xsetroot -name " BAT $BSTAT% | $WSTAT | VOL $VSTAT | $(date '+%r')"
+        xsetroot -name " WEB: $wstat $btitle$bstat$per$cstat$bend VOL: $vstat | $(date '+%d/%m/%Y %H:%M') "
         sleep 1
 
 done &
