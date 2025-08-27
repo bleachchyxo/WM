@@ -1,28 +1,60 @@
+#!/bin/sh
+
+# Source profile if it exists
 [ -f ~/.xprofile ] && . ~/.xprofile
 
+# Xcompmgr for compositing (for transparency, shadows, etc.)
+xcompmgr -cC -t.25 -r2.2 -o.25 &
+
+# Define paths
+bat_path=/sys/class/power_supply/BAT0
+wifi_path=$(ls /sys/class/net | grep -E 'wlp|wlan' | head -n 1)
+eth_path=$(ls /sys/class/net | grep -E 'enp|eth' | head -n 1)
+
+# Function to check network status
+get_network_status() {
+    local wifi_state ethernet_state
+    wifi_state=$(cat /sys/class/net/$wifi_path/operstate 2>/dev/null)
+    ethernet_state=$(cat /sys/class/net/$eth_path/operstate 2>/dev/null)
+    if [ "$wifi_state" = "up" ] || [ "$ethernet_state" = "up" ]; then
+        echo "Up"
+    else
+        echo "Down"
+    fi
+}
+
+# Function to get volume status
+get_volume_status() {
+    amixer get Master | awk -F'[][]' 'END{ print $2 }'
+}
+
+# Function to get battery status
+get_battery_status() {
+    [ -e "$bat_path/capacity" ] && {
+        local bstat
+        bstat=$(cat "$bat_path/capacity")
+        local bat_status
+        bat_status=$(cat "$bat_path/status")
+        local cstat
+        [ "$bat_status" = "Charging" ] && cstat="⚡ " || cstat=""
+        echo "| BAT: $bstat% $cstat"
+    } || echo ""
+}
+
+# Main loop
 while true; do
+    # Get status components
+    vol_stat=$(get_volume_status)
+    net_stat=$(get_network_status)
+    bat_stat=$(get_battery_status)
 
-        # Battery remaining
-        [ -f "/sys/class/power_supply/BAT0/capacity" ] && BSTAT="$(cat /sys/class/power_supply/BAT0/capacity)/100" || BSTAT="Cable connected"
-
-        # Wifi status
-        WSIGN="$(awk '/wlan0/ {print substr($3,1,2)}' /proc/net/wireless)"
-        WSIGN=$((WSIGN * 10 / 7))
-        [ $WSIGN -lt 1 ] && WSTAT="Offline"
-        [ $WSIGN -gt 0 ] && WSTAT="#:::::::::"
-        [ $WSIGN -gt 10 ] && WSTAT="##::::::::"
-        [ $WSIGN -gt 20 ] && WSTAT="###:::::::"
-        [ $WSIGN -gt 30 ] && WSTAT="####::::::"
-        [ $WSIGN -gt 40 ] && WSTAT="#####:::::"
-        [ $WSIGN -gt 50 ] && WSTAT="######::::"
-        [ $WSIGN -gt 60 ] && WSTAT="#######:::"
-        [ $WSIGN -gt 70 ] && WSTAT="########::"
-        [ $WSIGN -gt 80 ] && WSTAT="#########:"
-        [ $WSIGN -gt 90 ] && WSTAT="##########"
-
-        # Status render
-        xsetroot -name " Wifi: [$WSTAT] | Battery: $BSTAT | $(date '+%d/%m/%Y %H:%M') "
-        sleep 1
-
+    # Set the status bar
+    xsetroot -name "WEB: $net_stat $bat_stat VOL: $vol_stat | $(date '+%d/%m/%Y %H:%M')"
+    
+    # Update every second
+    sleep 1
 done &
+
+# Start window manager
 exec dwm
+
