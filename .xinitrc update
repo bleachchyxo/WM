@@ -46,7 +46,7 @@ while true; do
     wstat=$(get_network_status)
 
     # Display the status on the root window (bottom bar)
-    xsetroot -name "WEB: $wstat $btitle$bstat$per$cstat$bend VOL: $vstat | $(date '+%I:%M %p')"
+    xsetroot -name " WEB: $wstat $btitle$bstat$per$cstat$bend VOL: $vstat | $(date '+%I:%M %p') "
 
     # Sleep for 1 second before updating
     sleep 1
