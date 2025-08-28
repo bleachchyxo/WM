@@ -1,49 +1,57 @@
-#!/bin/sh
+#!/bin/bash
 
-# Source profile if it exists
+# Load profile if exists
 [ -f ~/.xprofile ] && . ~/.xprofile
 
-# Start xcompmgr for compositing effects
-xcompmgr -cC -t.25 -r2.2 -o.25 &
+# Paths for battery and network
+bat_path=/sys/class/power_supply/BAT0
+wifi_paths=(/sys/class/net/wlp*/operstate /sys/class/net/wlan*/operstate)
+eth_paths=(/sys/class/net/enp*/operstate /sys/class/net/eth*/operstate)
 
-# Auto-detect interfaces
-wifi_path=$(ls /sys/class/net | awk '/wlp|wlan/ {print $1; exit}')
-eth_path=$(ls /sys/class/net | awk '/enp|eth/ {print $1; exit}')
-
-# Function to get network status
+# Function to get the first available network interface that is up
 get_network_status() {
-    [ -e "/sys/class/net/$wifi_path/operstate" ] && wifi_state=$(<"/sys/class/net/$wifi_path/operstate")
-    [ -e "/sys/class/net/$eth_path/operstate" ] && ethernet_state=$(<"/sys/class/net/$eth_path/operstate")
-    [ "$wifi_state" = "up" ] || [ "$ethernet_state" = "up" ] && echo "Up" || echo "Down"
+    for path in "${wifi_paths[@]}" "${eth_paths[@]}"; do
+        [ -e "$path" ] && [ "$(cat "$path")" == "up" ] && echo "Up" && return
+    done
+    echo "Down"
 }
 
-# Function to get volume status
-get_volume_status() {
-    amixer get Master | awk -F'[][]' 'END{ print $2 }'
-}
-
-# Function to get battery status (optional)
-get_battery_status() {
-    [ -e "$bat_path/capacity" ] && {
-        bstat=$(<"$bat_path/capacity")
-        bat_status=$(<"$bat_path/status")
-        echo "| BAT: $bstat% $( [ "$bat_status" = "Charging" ] && echo "⚡" )"
-    } || echo ""
-}
+# Start xcompmgr for compositing
+xcompmgr -t.25 -r2.2 -o.25 &
 
 # Main loop
 while true; do
-    vol_stat=$(get_volume_status)
-    net_stat=$(get_network_status)
-    bat_stat=$(get_battery_status)
+    # Volume status
+    vstat="$(amixer get Master | awk -F'[][]' 'END {print $2}')"
 
-    # Set the status bar
-    xsetroot -name "WEB: $net_stat $bat_stat VOL: $vol_stat | $(date '+%d/%m/%Y %H:%M')"
+    # Battery status (only if laptop with battery)
+    if [ -e "$bat_path/capacity" ]; then
+        bstat=$(<"$bat_path/capacity")
+        bat_status=$(<"$bat_path/status")
+        btitle="| BAT: "
+        per="% "
+        bend="|"
+        # Charging status
+        [ "$bat_status" == "Charging" ] && cstat="⚡ " || cstat=""
+    else
+        bstat="|"
+        bat_status=""
+        btitle=""
+        per=""
+        bend=""
+        cstat=""
+    fi
 
-    # Update every second
+    # Network status (Up/Down)
+    wstat=$(get_network_status)
+
+    # Display the status on the root window (bottom bar)
+    xsetroot -name "WEB: $wstat $btitle$bstat$per$cstat$bend VOL: $vstat | $(date '+%I:%M %p')"
+
+    # Sleep for 1 second before updating
     sleep 1
 done &
 
-# Start window manager
+# Launch window manager
 exec dwm
 
